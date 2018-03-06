@@ -1,6 +1,7 @@
 package it.denv.supsi.progconc.serie.serie2.es3;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Whitdrawal {
     public static void main(String args[]){
@@ -11,12 +12,13 @@ public class Whitdrawal {
         users.add(new User("Jace", "Kyler"));
         users.add(new User("Jessie", "Serena"));
 
-        Account a = new Account(10000,0);
+        Account a = new Account(500,0);
 
         System.out.println("=== Simulation START ===");
 
         ArrayList<WhitdrawalProcess> whitdrawalProcesses = new ArrayList<>();
-        for(int i=0; i < 100 ; i++){
+        Random r = new Random();
+        for(int i=0; i < 50 ; i++){
             whitdrawalProcesses.add(new WhitdrawalProcess(users.get(i%5), a));
         }
 
