@@ -9,3 +9,7 @@ Risoluzione degli esercizi per il corso C02045.2 (M02056.2) di [Programmazione C
 ## Corso
 
 ### Introduzione alla Concurrency (Serie 1)
+
+### Thread-Safety (Prima Parte) (Serie 2)
+
+### Thread Safety (Seconda Parte) (Serie 3)
