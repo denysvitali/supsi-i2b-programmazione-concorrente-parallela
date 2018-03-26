@@ -1,4 +1,4 @@
-package serie04;
+package it.denv.supsi.progconc.serie.serie4.es3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,20 +18,23 @@ class Contact implements Runnable {
 		int version = -1;
 		while  (true) {
 			// Wait for version updates
+
 			if (version == S4Esercizio3.version)
 				continue;
 			// Update local version
-			version = S4Esercizio3.version;
-			// Used to terminate
-			if (version == -1)
-				break;
-			
-			// update local numbers
-			int home = S4Esercizio3.home;
-			int office = S4Esercizio3.office;
-			int mobile = S4Esercizio3.mobile;
-			int emergency = S4Esercizio3.emergency;
-			System.out.println("Contact" + id + ": new Phonenumbers [home=" + home + ", office=" + office + ", mobile=" + mobile + ", emergency=" + emergency + "]");
+			synchronized (this) {
+				version = S4Esercizio3.version;
+				// Used to terminate
+				if (version == -1)
+					break;
+
+				// update local numbers
+				int home = S4Esercizio3.home;
+				int office = S4Esercizio3.office;
+				int mobile = S4Esercizio3.mobile;
+				int emergency = S4Esercizio3.emergency;
+				System.out.println("Contact" + id + ": new Phonenumbers [home=" + home + ", office=" + office + ", mobile=" + mobile + ", emergency=" + emergency + "]");
+			}
 		}
 		System.out.println("Contact" + id + ": terminating");
 	}
@@ -44,7 +47,7 @@ public class S4Esercizio3 {
 	public static int office;
 	public static int mobile;
 	public static int emergency;
-	public static int version;
+	public static volatile int version;
 	
 	private static int getNewPhoneNumber() {
 		// simulate some time comsuming task to obtain a new number from operator 

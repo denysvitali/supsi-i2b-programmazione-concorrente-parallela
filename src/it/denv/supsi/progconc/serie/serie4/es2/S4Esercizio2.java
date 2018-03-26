@@ -1,4 +1,4 @@
-package serie04;
+package it.denv.supsi.progconc.serie.serie4.es2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +24,12 @@ class Sensore implements Runnable {
 	}
 	
 	private boolean resetIfAbove() {
-		int currentAmount = S4Esercizio2.counter.get();
-		if (currentAmount < soglia)
-			return false;
-		S4Esercizio2.counter.set(0);
-		return true;
+		if(S4Esercizio2.counter.get() > soglia) {
+			while (!S4Esercizio2.counter.compareAndSet(0, 0)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
 
