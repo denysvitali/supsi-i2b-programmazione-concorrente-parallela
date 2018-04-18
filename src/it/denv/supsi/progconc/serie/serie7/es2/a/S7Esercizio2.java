@@ -1,7 +1,6 @@
-package it.denv.supsi.progconc.serie.serie7.es2.c;
+package it.denv.supsi.progconc.serie.serie7.es2.a;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 class S7Es2Timer {
 	private long startTime = -1;
@@ -38,11 +37,11 @@ class ReadWorker implements Runnable {
 		while (S7Esercizio2.isRunning) {
 			compareCounter++;
 			final StringBuffer sb = new StringBuffer();
-			for (String s : S7Esercizio2.sharedPhrase) {
-				sb.append(s);
+			final Iterator<String> iterator = S7Esercizio2.sharedPhrase.iterator();
+			while (iterator.hasNext()) {
+				sb.append(iterator.next());
 				sb.append(" ");
 			}
-
 			// Build phrase string from shares words
 
 			// Compare strings: if shared pharse has changed update local
@@ -89,7 +88,7 @@ public class S7Esercizio2 {
 	// Used to know when all adders have finished
 	static volatile boolean isRunning = true;
 
-	static volatile List<String> sharedPhrase;
+	static List<String> sharedPhrase;
 
 	public static void main(final String[] args) {
 		final S7Es2Timer timer = new S7Es2Timer();
@@ -101,10 +100,9 @@ public class S7Esercizio2 {
 		}
 
 		// Share list
-		S7Esercizio2.sharedPhrase = new CopyOnWriteArrayList<>(list);
+		S7Esercizio2.sharedPhrase = Collections.synchronizedList(list);
 
-		// Cr
-		// eate WordAdder and Reader threads
+		// Create WordAdder and Reader threads
 		final List<ReadWorker> allWorkers = new ArrayList<>();
 		final List<Thread> allThreads = new ArrayList<>();
 		for (int i = 0; i < 15; i++) {
@@ -121,7 +119,9 @@ public class S7Esercizio2 {
 		}
 
 		for (int i = 0; i < 10; i++) {
-			S7Esercizio2.sharedPhrase.add(getWord());
+			synchronized (S7Esercizio2.sharedPhrase) {
+				S7Esercizio2.sharedPhrase.add(getWord());
+			}
 			try {
 				Thread.sleep(1000);
 			} catch (final InterruptedException e) {
