@@ -3,7 +3,7 @@ package it.denv.supsi.progconc.serie.test1_prova.es1;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Classe che simula periodi di carestia per i paesi
@@ -18,13 +18,11 @@ class Carestia implements Runnable {
 
             // 0.1 .. 0.7
             final double fattoreDecimazione = random.nextDouble() * 0.6 + 0.1;
-            final long popolazioneAggiornata;
+            final AtomicLong popolazioneAggiornata;
 
             // decima la popolazione
-            EsercizioPopolazioni.lock.lock();
-            EsercizioPopolazioni.popolazione[popoloScelto] *= fattoreDecimazione;
+            EsercizioPopolazioni.popolazione[popoloScelto].getAndUpdate(operand -> (long) (operand*fattoreDecimazione));
             popolazioneAggiornata = EsercizioPopolazioni.popolazione[popoloScelto];
-            EsercizioPopolazioni.lock.unlock();
 
             System.out.println("Carestia: Popolazione " + popoloScelto + " diminuita a " + popolazioneAggiornata
                     + " del fattore " + fattoreDecimazione);
@@ -50,15 +48,13 @@ class Prosperita implements Runnable {
             final int popoloScelto = random.nextInt(EsercizioPopolazioni.popolazione.length);
 
             final double fattoreCrescita = random.nextDouble() * 0.55 + 1.05;
-            final long popolazioneAggiornata;
+            final AtomicLong popolazioneAggiornata;
 
             // incrementa la popolazione
-            EsercizioPopolazioni.lock.lock();
-            EsercizioPopolazioni.popolazione[popoloScelto] *= fattoreCrescita;
+            EsercizioPopolazioni.popolazione[popoloScelto].getAndUpdate(operand -> (long) (operand*fattoreCrescita));
             popolazioneAggiornata = EsercizioPopolazioni.popolazione[popoloScelto];
-            EsercizioPopolazioni.lock.unlock();
 
-            System.out.println("Prosperita: Popolazione " + popoloScelto + " cresciuta a " + popolazioneAggiornata
+            System.out.println("Prosperita: Popolazione " + popoloScelto + " cresciuta a " + popolazioneAggiornata.get()
                     + " del fattore " + fattoreCrescita);
 
             try {
@@ -74,13 +70,12 @@ class Prosperita implements Runnable {
  * Programma che simula la variazione demografica di 5 paesi
  */
 public class EsercizioPopolazioni {
-    static volatile long popolazione[] = new long[5];
-    static ReentrantLock lock = new ReentrantLock();
+    static volatile AtomicLong popolazione[] = new AtomicLong[5];
 
     public static void main(final String[] args) {
         // la popolazione iniziale è di 1000 abitanti per ogni paese
         for (int i = 0; i < 5; i++)
-            popolazione[i] = 1000;
+            popolazione[i] = new AtomicLong(1000);
 
         final List<Thread> allThreads = new ArrayList<>();
         allThreads.add(new Thread(new Prosperita()));
